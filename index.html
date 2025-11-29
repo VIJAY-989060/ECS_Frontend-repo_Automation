@@ -1,0 +1,18 @@
+<html>
+  <body>
+    <h1>Frontend on ECS</h1>
+    <p id="message">Loading...</p>
+
+    <script>
+      fetch("/api")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("message").innerText = data.message;
+        })
+        .catch(() => {
+          document.getElementById("message").innerText = "Could not reach backend";
+        });
+    </script>
+  </body>
+</html>
+
