@@ -1,0 +1,40 @@
+version: 0.2
+# Environment variables
+env:
+  variables:
+    AWS_ACCOUNT_ID: "503561455231"
+    AWS_REGION: "us-east-1"
+    ECR_REPO_NAME: "frontend-repo"
+    ECS_SERVICE_NAME: "Frontend_TD-service-stwqcb9t"
+    ECS_CLUSTER_NAME: "ECS-Test-App_deployment_cluster"   # Assumed Cluster Name
+
+phases:
+  pre_build:
+    commands:
+      # 1. ECR Login
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      
+      # 2. Tag banana
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
+
+  build:
+    commands:
+      # 1. Docker image banana
+      - echo Building Docker image: $ECR_REPO_NAME...
+      - docker build -t $IMAGE_URI .
+
+  post_build:
+    commands:
+      # 1. Image ko ECR par push karna
+      - echo Pushing image to ECR...
+      - docker push $IMAGE_URI
+      
+      # 2. CRITICAL: Deployment Artifact banana, using your actual container name
+      - echo Creating imagedefinitions.json artifact...
+      - printf '[{"name":"frontend_container","imageUri":"%s"}]' $IMAGE_URI > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
