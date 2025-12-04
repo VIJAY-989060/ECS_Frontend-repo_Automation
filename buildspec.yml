@@ -21,8 +21,8 @@ phases:
 
   build:
     commands:
-      # 1. Docker image banana (Correct Indentation Applied)
-      - echo Building Docker image: $ECR_REPO_NAME...
+      # 1. Docker image banana
+      - echo "Building Docker image: $ECR_REPO_NAME..."
       - docker build -t $IMAGE_URI .
 
   post_build:
