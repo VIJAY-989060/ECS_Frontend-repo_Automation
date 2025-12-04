@@ -19,7 +19,7 @@ phases:
   build:
     commands:
       # Niche wali line mein quotes " " lagana zaroori hai
-      - echo "Building Docker image: $ECR_REPO_NAME..."
+      - echo "Building Docker image $ECR_REPO_NAME..."
       - docker build -t $IMAGE_URI .
 
   post_build:
