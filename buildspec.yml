@@ -11,28 +11,23 @@ env:
 phases:
   pre_build:
     commands:
-      # 1. ECR Login
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-      
-      # 2. Tag banana
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
 
   build:
     commands:
-      # 1. Docker image banana
+      # Niche wali line mein quotes " " lagana zaroori hai
       - echo "Building Docker image: $ECR_REPO_NAME..."
       - docker build -t $IMAGE_URI .
 
   post_build:
     commands:
-      # 1. Image ko ECR par push karna
       - echo Pushing image to ECR...
       - docker push $IMAGE_URI
-      
-      # 2. CRITICAL: Deployment Artifact banana
       - echo Creating imagedefinitions.json artifact...
+      # Container name 'frontend_container' check kar lena ki task definition mein same hai ya nahi
       - printf '[{"name":"frontend_container","imageUri":"%s"}]' $IMAGE_URI > imagedefinitions.json
 
 artifacts:
